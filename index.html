@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.csv.js"></script>
+  <title>School Data Explorer: NYC</title>
+ </head>
+ <body>
+  <div id="controls">
+   <button id="geo_button">Geo</button>
+   <button id="data_button">Data</button>
+   X: 
+   <select id="x_data">
+    <option value="overall">Overall</option>
+    <option value="progress">Progress</option>
+    <option value="performance" selected="selected">Performance</option>
+    <option value="environment">Environment</option>
+    <option value="pi">Peer Index</option>
+    <option value="enrollment">Enrollment</option>
+   </select>
+   Y: 
+   <select id="y_data">
+    <option value="overall">Overall</option>
+    <option value="progress" selected="selected">Progress</option>
+    <option value="performance">Performance</option>
+    <option value="environment">Environment</option>
+    <option value="pi">Peer Index</option>
+    <option value="enrollment">Enrollment</option>
+   </select>
+   color: 
+   <select id="color">
+    <option value="overall">Overall</option>
+    <option value="progress">Progress</option>
+    <option value="performance">Performance</option>
+    <option value="environment">Environment</option>
+    <option value="pi" selected="selected">Peer Index</option>
+    <option value="enrollment">Enrollment</option>
+   </select>
+   size: 
+   <select id="size">
+    <option value="overall">Overall</option>
+    <option value="progress">Progress</option>
+    <option value="performance">Performance</option>
+    <option value="environment">Environment</option>
+    <option value="pi">Peer Index</option>
+    <option value="enrollment" selected="selected">Enrollment</option>
+   </select>
+   <input type="number" id="year" value="2011" min="2007" max="2011">
+  </div>
+  <div id="visualization" style="margin-left:100px;margin-top:40px;">
+  </div>
+  <div id="control_area_two">
+   <textarea rows="20" cols="10" id="school_list"></textarea>
+  </div>
+<script type='text/javascript'>
+
+var w = 640,
+    h = 640,
+    x = d3.scale.linear().range([0, w]),
+    // SVG indexes the screen like a matrix
+    y = d3.scale.linear().range([h, 0]),
+    c = d3.scale.linear().range(["steelblue", "red"]),
+    s = d3.scale.sqrt().range([2, 10]);
+
+var year = '2011';
+var mode = 'geo'; // 'data' for data mode
+var x_data = document.getElementById('x_data')
+var y_data = document.getElementById('y_data')
+var color = document.getElementById('color')
+var size = document.getElementById('size')
+var school_list = document.getElementById('school_list')
+
+d3.csv("data.csv", processDataAndDisplay);
+
+function processDataAndDisplay(data) {
+    // make the sign of longitude work right...
+    // honestly, this is mysterious...
+    data.forEach(function(d) {
+        d.long = +d.long;
+    });
+
+    matchScaleToData(x, function(d) { return d.long; });
+    matchScaleToData(y, function(d) { return d.lat; });
+
+    var svg = d3.select("#visualization")
+        .append("svg");
+
+    svg
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) { return x(d.long); })
+        .attr("cy", function(d) { return y(d.lat); })
+        .attr("r", 4)
+        .style("fill", "steelblue")
+        .style("fill-opacity", 0.1)
+        .style("stroke-opacity", 0.1)
+        .style("stroke","black")
+        .attr("class", "school")
+        .attr("id", function(d) { return d.dbn; })
+        .append("title").text(function(d) { return d.dbn; });
+
+// this is not very good, this...
+// how to get a label to follow the circle around?
+    d3.selectAll("circle")
+        .on("click", function(d) {
+            window.open("http://schools.nyc.gov/FindASchool/schoolreports.htm?loc=" + d.dbn.substring(2,6) + "&type=progressreport")
+        });
+
+    d3.select("#x_data").on("change", function() {
+        if (mode == 'data') {
+            updateXposition(year+this.value);
+        }
+    });
+    d3.select("#y_data").on("change", function() {
+        if (mode == 'data') {
+            updateYposition(year+this.value);
+        }
+    });
+    d3.select("#color").on("change", function() {
+            updateColor(year+this.value);
+    });
+    d3.select("#size").on("change", function() {
+            updateSize(year+this.value);
+    });
+    d3.select("#year").on("change", function() {
+        year = this.value;
+        if (mode == 'data') {
+            updateAll();
+        }
+    });
+    d3.select("#data_button").on("click", function() {
+        mode = 'data';
+        updateAll();
+    });
+    d3.select("#geo_button").on("click", function() {
+        mode = 'geo';
+        matchScaleToData(x, function(d) { return d.long; });
+        matchScaleToData(y, function(d) { return d.lat; });
+        svg.selectAll("circle")
+            .transition().duration(2400)
+            .attr("cx", function(d) { return x(d.long); })
+            .attr("cy", function(d) { return y(d.lat); });
+    });
+
+    function updateAll() {
+        matchScaleToData(x, function(d) { return d[year+x_data.value]; });
+        matchScaleToData(y, function(d) { return d[year+y_data.value]; });
+        matchScaleToData(c, function(d) { return d[year+color.value]; });
+        matchScaleToData(s, function(d) { return d[year+size.value]; });
+        svg.selectAll("circle")
+            .transition().duration(2400)
+            .attr("cx", function(d) { return x(d[year+x_data.value]); })
+            .attr("cy", function(d) { return y(d[year+y_data.value]); })
+            .style("fill", function(d) { return c(d[year+color.value]); })
+            .attr("r", function(d) { return s(d[year+size.value]); });
+    }
+    function updateXposition(data_choice) {
+        matchScaleToData(x, function(d) { return d[data_choice]; });
+        svg.selectAll("circle")
+            .transition().duration(1000)
+            .attr("cx", function(d) { return x(d[data_choice]); });
+    }
+    function updateYposition(data_choice) {
+        matchScaleToData(y, function(d) { return d[data_choice]; });
+        svg.selectAll("circle")
+            .transition().duration(1000)
+            .attr("cy", function(d) { return y(d[data_choice]); });
+    }
+    function updateColor(data_choice) {
+        matchScaleToData(c, function(d) { return d[data_choice]; });
+        svg.selectAll("circle")
+            .transition().duration(1000)
+            .style("fill", function(d) { return c(d[data_choice]); });
+    }
+    function updateSize(data_choice) {
+        matchScaleToData(s, function(d) { return d[data_choice]; });
+        svg.selectAll("circle")
+            .transition().duration(1000)
+            .attr("r", function(d) { return s(d[data_choice]); });
+    }
+    function matchScaleToData(scale, fieldFunction) {
+        var minimum = d3.min(data, fieldFunction),
+            maximum = d3.max(data, fieldFunction);
+        scale.domain([minimum, maximum]);
+    }
+}
+
+</script>
+ </body>
+</html>
