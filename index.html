@@ -7,6 +7,26 @@
   <title>School Data Explorer: NYC</title>
  </head>
  <body>
+
+<!-- Google Chrome Frame -->
+<!--[if IE]>
+    <script type="text/javascript" 
+     src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
+    <div id="prompt">
+     <!-- if IE without GCF, prompt goes here -->
+    </div>
+     <script>
+     // The conditional ensures that this code will only execute in IE,
+     // Therefore we can use the IE-specific attachEvent without worry
+     window.attachEvent("onload", function() {
+       CFInstall.check({
+         mode: "overlay", 
+         node: "prompt"
+       });
+     });
+    </script>
+  <![endif]-->
+
   <div id="controls">
    <button id="geo_button">Geo</button>
    <button id="data_button">Data</button>
@@ -95,8 +115,8 @@ function processDataAndDisplay(data) {
         .attr("cy", function(d) { return y(d.lat); })
         .attr("r", 4)
         .style("fill", "steelblue")
-        .style("fill-opacity", 0.1)
-        .style("stroke-opacity", 0.1)
+        .style("fill-opacity", 0.6)
+        .style("stroke-opacity", 0.6)
         .style("stroke","black")
         .attr("class", "school")
         .attr("id", function(d) { return d.dbn; })
