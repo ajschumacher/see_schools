@@ -3,7 +3,6 @@
  <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
-  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.csv.js"></script>
   <title>School Data Explorer: NYC</title>
  </head>
  <body>
@@ -150,6 +149,9 @@ function processDataAndDisplay(data) {
         if (mode == 'data') {
             updateAll();
         }
+    });
+    d3.select("#school_list").on("change", function() {
+        var blah = 1;
     });
     d3.select("#data_button").on("click", function() {
         mode = 'data';
