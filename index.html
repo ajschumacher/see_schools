@@ -3,14 +3,19 @@
  <head>
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
-  <script type="text/javascript" src="http://mbostock.github.com/d3/d3.csv.js"></script>
   <title>School Data Explorer: NYC</title>
+  <style type="text/css">
+    circle.school {
+      fill-opacity: 0.1;
+      stroke-opacity: 0.1;
+    }
+  </style>
  </head>
  <body>
 
 <!-- Google Chrome Frame -->
 <!--[if IE]>
-    <script type="text/javascript" 
+    <script type="text/javascript"
      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js"></script>
     <div id="prompt">
      <!-- if IE without GCF, prompt goes here -->
@@ -20,7 +25,7 @@
      // Therefore we can use the IE-specific attachEvent without worry
      window.attachEvent("onload", function() {
        CFInstall.check({
-         mode: "overlay", 
+         mode: "overlay",
          node: "prompt"
        });
      });
@@ -30,7 +35,7 @@
   <div id="controls">
    <button id="geo_button">Geo</button>
    <button id="data_button">Data</button>
-   X: 
+   X:
    <select id="x_data">
     <option value="overall">Overall</option>
     <option value="progress">Progress</option>
@@ -39,7 +44,7 @@
     <option value="pi">Peer Index</option>
     <option value="enrollment">Enrollment</option>
    </select>
-   Y: 
+   Y:
    <select id="y_data">
     <option value="overall">Overall</option>
     <option value="progress" selected="selected">Progress</option>
@@ -48,7 +53,7 @@
     <option value="pi">Peer Index</option>
     <option value="enrollment">Enrollment</option>
    </select>
-   color: 
+   color:
    <select id="color">
     <option value="overall">Overall</option>
     <option value="progress">Progress</option>
@@ -57,7 +62,7 @@
     <option value="pi" selected="selected">Peer Index</option>
     <option value="enrollment">Enrollment</option>
    </select>
-   size: 
+   size:
    <select id="size">
     <option value="overall">Overall</option>
     <option value="progress">Progress</option>
@@ -115,8 +120,6 @@ function processDataAndDisplay(data) {
         .attr("cy", function(d) { return y(d.lat); })
         .attr("r", 4)
         .style("fill", "steelblue")
-        .style("fill-opacity", 0.6)
-        .style("stroke-opacity", 0.6)
         .style("stroke","black")
         .attr("class", "school")
         .attr("id", function(d) { return d.dbn; })
@@ -149,6 +152,14 @@ function processDataAndDisplay(data) {
         year = this.value;
         if (mode == 'data') {
             updateAll();
+        }
+    });
+    d3.select("#school_list").on("change", function() {
+        lines = this.value.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+            var temp = document.getElementById(lines[i])
+            temp.style.fillOpacity=0.9;
+            temp.style.strokeOpacity=0.9;
         }
     });
     d3.select("#data_button").on("click", function() {
