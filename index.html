@@ -4,6 +4,12 @@
   <meta http-equiv="content-type" content="text/html;charset=utf-8">
   <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
   <title>School Data Explorer: NYC</title>
+  <style type="text/css">
+    circle.school {
+      fill-opacity: 0.1;
+      stroke-opacity: 0.1;
+    }
+  </style>
  </head>
  <body>
 
@@ -114,8 +120,6 @@ function processDataAndDisplay(data) {
         .attr("cy", function(d) { return y(d.lat); })
         .attr("r", 4)
         .style("fill", "steelblue")
-        .style("fill-opacity", 0.6)
-        .style("stroke-opacity", 0.6)
         .style("stroke","black")
         .attr("class", "school")
         .attr("id", function(d) { return d.dbn; })
@@ -151,7 +155,12 @@ function processDataAndDisplay(data) {
         }
     });
     d3.select("#school_list").on("change", function() {
-        var blah = 1;
+        lines = this.value.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+            var temp = document.getElementById(lines[i])
+            temp.style.fillOpacity=0.9;
+            temp.style.strokeOpacity=0.9;
+        }
     });
     d3.select("#data_button").on("click", function() {
         mode = 'data';
