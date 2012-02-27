@@ -1,3 +1,7 @@
 This d3.js visualization uses public data from NYC public schools.
 Original data available largely at 
 http://schools.nyc.gov/Accountability/tools/report/default.htm
+
+Okay: to make it actually work on your computer, run 
+python -m SimpleHTTPServer 
+or similar from the repo directory and go to http://localhost:8000

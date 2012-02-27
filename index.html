@@ -177,7 +177,9 @@ function processDataAndDisplay(data) {
         .style("stroke","black")
         .attr("class", "school")
         .attr("id", function(d) { return d.dbn; })
-        .append("title").text(function(d) { return d.dbn; });
+        .append("title").text(function(d) { return d.dbn +
+                                                   " " +
+                                                   d.name; });
 
 // this is not very good, this...
 // how to get a label to follow the circle around?
